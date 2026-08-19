@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قائمتي — VORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></a>
+    <nav class="header-nav">
+      <a href="index.html#categories">التصنيفات</a>
+      <a href="index.html#deals">أفضل العروض</a>
+    </nav>
+    <div class="header-actions"><div id="authSlot" class="auth-slot"></div></div>
+  </div>
+</header>
+
+<main class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>قائمة المفضلة</h2>
+      <p class="section-sub">المنتجات اللي حفظتها لمتابعتها</p>
+    </div>
+    <div class="wishlist-grid" id="wishlistGrid"><div class="skeleton-row"></div></div>
+  </div>
+</main>
+
+<main class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="panel">
+      <div class="panel-head"><h2>تنبيهات الأسعار المفعّلة</h2></div>
+      <div class="table-wrap">
+        <table class="data-table" id="alertsTable">
+          <thead><tr><th>المنتج</th><th>السعر المستهدف</th><th>الحالة</th><th></th></tr></thead>
+          <tbody><tr><td colspan="4" class="price-hint">جاري التحميل…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { supabase } from './js/supabase-client.js';
+  import { renderAuthState, requireAuth } from './js/auth.js';
+
+  const fmt = new Intl.NumberFormat('ar-SA');
+  const money = (n) => `${fmt.format(Math.round(n))} ر.س`;
+
+  renderAuthState();
+
+  (async () => {
+    const user = await requireAuth();
+    if (!user) return;
+
+    // Wishlist
+    const grid = document.getElementById('wishlistGrid');
+    const { data: wl } = await supabase
+      .from('wishlist')
+      .select('product_id, products ( name_ar, slug, primary_image_url, rating, product_offers ( price, previous_price ) )')
+      .eq('user_id', user.id);
+
+    if (!wl || !wl.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">♡</div><p>ما ضفت أي منتج للمفضلة بعد.</p></div>';
+    } else {
+      grid.innerHTML = wl.map(({ products: p }) => {
+        const offers = p.product_offers || [];
+        const best = offers.length ? [...offers].sort((a,b)=>a.price-b.price)[0] : null;
+        const img = p.primary_image_url || '';
+        return `
+          <a class="product-card" href="product.html?slug=${encodeURIComponent(p.slug)}">
+            <div class="product-thumb"><img src="${img}" alt="${p.name_ar}" loading="lazy"></div>
+            <div class="product-body">
+              <div class="product-name">${p.name_ar}</div>
+              <div class="price-row">${best ? `<span class="price-now">${money(best.price)}</span>` : '<span class="price-hint">غير متوفر</span>'}</div>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    // Alerts
+    const tbody = document.querySelector('#alertsTable tbody');
+    const { data: alerts } = await supabase
+      .from('price_alerts')
+      .select('id, target_price, is_active, triggered_at, products ( name_ar, slug )')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (!alerts || !alerts.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="price-hint">ما فعّلت أي تنبيه سعر بعد.</td></tr>';
+    } else {
+      tbody.innerHTML = alerts.map(a => `
+        <tr>
+          <td><a href="product.html?slug=${encodeURIComponent(a.products?.slug ?? '')}">${a.products?.name_ar ?? 'منتج'}</a></td>
+          <td style="font-family:var(--font-mono);">${money(a.target_price)}</td>
+          <td>${a.triggered_at ? '<span class="pill pill-green">تم التنبيه</span>' : a.is_active ? '<span class="pill pill-gray">بالانتظار</span>' : '<span class="pill pill-orange">موقوف</span>'}</td>
+          <td><button class="btn btn-ghost btn-sm" data-id="${a.id}" onclick="deleteAlert('${a.id}')">حذف</button></td>
+        </tr>
+      `).join('');
+    }
+  })();
+
+  window.deleteAlert = async (id) => {
+    await supabase.from('price_alerts').delete().eq('id', id);
+    location.reload();
+  };
+</script>
+</body>
+</html>

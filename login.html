@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول — VORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <a href="index.html" class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></a>
+    <div class="auth-title">أهلًا فيك من جديد</div>
+    <div class="auth-sub">سجّل دخولك عشان تتابع أسعارك وقائمتك</div>
+
+    <div class="form-msg" id="formMsg"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">تسجيل الدخول</button>
+    </form>
+
+    <div class="auth-foot">ما عندك حساب؟ <a href="register.html">أنشئ حساب جديد</a></div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase } from './js/supabase-client.js';
+  import { getProfile } from './js/auth.js';
+
+  const form = document.getElementById('loginForm');
+  const msg = document.getElementById('formMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showMsg(text, type) {
+    msg.textContent = text;
+    msg.className = `form-msg show ${type}`;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.textContent = 'جاري الدخول…';
+    submitBtn.disabled = true;
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showMsg(error.message === 'Invalid login credentials' ? 'البريد أو كلمة المرور غير صحيحة' : error.message, 'error');
+      submitBtn.textContent = 'تسجيل الدخول';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    const profile = await getProfile();
+    if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+      window.location.href = 'admin/dashboard.html';
+    } else if (profile?.role === 'merchant') {
+      window.location.href = 'merchant/dashboard.html';
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

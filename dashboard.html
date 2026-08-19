@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة المتجر — VORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <a href="../index.html" class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></a>
+    <nav class="dash-nav">
+      <a href="#overview" class="nav-link active" data-section="overview">📊 نظرة عامة</a>
+      <a href="#store" class="nav-link" data-section="store">🏪 متجري</a>
+      <a href="#products" class="nav-link" data-section="products">📦 منتجاتي</a>
+      <a href="#import" class="nav-link" data-section="import">⬇️ استيراد منتج</a>
+      <a href="#subscription" class="nav-link" data-section="subscription">💳 الاشتراك</a>
+    </nav>
+    <div class="dash-user" id="dashUser">جاري التحميل…</div>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <section class="dash-section" id="sec-overview">
+      <div class="dash-head"><div><h1>نظرة عامة</h1><p>ملخص أداء متجرك في VORA</p></div></div>
+      <div class="stat-cards" id="overviewStats">
+        <div class="stat-card"><div class="num">—</div><div class="label">منتجات نشطة</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">إجمالي العروض</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">حالة المتجر</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">حالة الاشتراك</div></div>
+      </div>
+      <div class="panel" id="noStorePanel" style="display:none;">
+        <div class="empty-state">
+          <div class="icon">🏪</div>
+          <p>ما أنشأت متجرك بعد. أنشئه الحين عشان تقدر تضيف منتجاتك.</p>
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="showSection('store')">أنشئ متجري</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORE -->
+    <section class="dash-section" id="sec-store" style="display:none;">
+      <div class="dash-head"><div><h1>إعدادات متجري</h1><p>هذي البيانات تظهر لعملائك في VORA</p></div></div>
+      <div class="panel">
+        <div class="form-msg" id="storeMsg"></div>
+        <form id="storeForm">
+          <div class="form-row">
+            <div class="form-group"><label for="storeName">اسم المتجر</label><input type="text" id="storeName" required></div>
+            <div class="form-group"><label for="storeCity">المدينة</label><input type="text" id="storeCity" placeholder="الرياض"></div>
+          </div>
+          <div class="form-group"><label for="storeDesc">وصف المتجر</label><textarea id="storeDesc" rows="3"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label for="storeWhatsapp">واتساب</label><input type="text" id="storeWhatsapp" placeholder="9665xxxxxxxx"></div>
+            <div class="form-group"><label for="storeWebsite">الموقع الإلكتروني</label><input type="text" id="storeWebsite" placeholder="https://"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="storeSubmitBtn">حفظ بيانات المتجر</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="dash-section" id="sec-products" style="display:none;">
+      <div class="dash-head">
+        <div><h1>منتجاتي</h1><p>المنتجات المرتبطة بمتجرك في VORA</p></div>
+        <button class="btn btn-primary" onclick="showSection('import')">+ إضافة منتج</button>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>المنتج</th><th>السعر</th><th>التوفر</th><th></th></tr></thead>
+            <tbody id="productsTableBody"><tr><td colspan="4" class="price-hint">جاري التحميل…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPORT / ADD -->
+    <section class="dash-section" id="sec-import" style="display:none;">
+      <div class="dash-head"><div><h1>إضافة منتج</h1><p>استورد منتج برابط جاهز، أو أضفه يدويًا</p></div></div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>استيراد برابط المنتج</h2></div>
+        <p class="price-hint" style="margin-bottom:14px;">حط رابط صفحة المنتج، وبنحاول نجيب لك الاسم والصورة والسعر تلقائيًا للمراجعة قبل النشر.</p>
+        <form id="importForm" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="form-group" style="flex:1; min-width:240px; margin-bottom:0;">
+            <input type="url" id="importUrl" placeholder="https://example.com/product/123" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="importBtn">استيراد</button>
+        </form>
+        <div class="form-msg" id="importMsg"></div>
+        <div id="importPreviewWrap"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>إضافة يدوية</h2></div>
+        <form id="manualForm">
+          <div class="form-row">
+            <div class="form-group"><label for="mName">اسم المنتج</label><input type="text" id="mName" required></div>
+            <div class="form-group"><label for="mPrice">السعر (ر.س)</label><input type="number" id="mPrice" min="1" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label for="mCategory">التصنيف</label><select id="mCategory"></select></div>
+            <div class="form-group"><label for="mImage">رابط الصورة</label><input type="url" id="mImage" placeholder="https://"></div>
+          </div>
+          <div class="form-group"><label for="mUrl">رابط صفحة المنتج (للانتقال إليه)</label><input type="url" id="mUrl" required></div>
+          <div class="form-group"><label for="mDesc">وصف مختصر</label><textarea id="mDesc" rows="2"></textarea></div>
+          <button type="submit" class="btn btn-primary" id="manualSubmitBtn">نشر المنتج</button>
+        </form>
+        <div class="form-msg" id="manualMsg"></div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIPTION -->
+    <section class="dash-section" id="sec-subscription" style="display:none;">
+      <div class="dash-head"><div><h1>الاشتراك</h1><p>تحكم بباقة متجرك وحد المنتجات</p></div></div>
+      <div class="panel" id="subscriptionPanel">
+        <p class="price-hint">جاري التحميل…</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="../js/merchant.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء حساب — VORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <a href="index.html" class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></a>
+    <div class="auth-title">أنشئ حسابك في VORA</div>
+    <div class="auth-sub">قارن الأسعار وتابع منتجاتك المفضلة، أو سجّل متجرك وابدأ البيع</div>
+
+    <div class="form-msg" id="formMsg"></div>
+
+    <form id="registerForm">
+      <div class="role-toggle">
+        <label><input type="radio" name="role" value="customer" checked><span>مستخدم</span></label>
+        <label><input type="radio" name="role" value="merchant"><span>صاحب متجر</span></label>
+      </div>
+
+      <div class="form-group">
+        <label for="fullName">الاسم الكامل</label>
+        <input type="text" id="fullName" required autocomplete="name">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني</label>
+          <input type="email" id="email" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="phone">الجوال</label>
+          <input type="tel" id="phone" placeholder="05xxxxxxxx" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" required minlength="6" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">إنشاء الحساب</button>
+    </form>
+
+    <div class="auth-foot">عندك حساب؟ <a href="login.html">سجّل دخولك</a></div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase } from './js/supabase-client.js';
+
+  const form = document.getElementById('registerForm');
+  const msg = document.getElementById('formMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showMsg(text, type) {
+    msg.textContent = text;
+    msg.className = `form-msg show ${type}`;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.textContent = 'جاري الإنشاء…';
+    submitBtn.disabled = true;
+
+    const role = form.querySelector('input[name="role"]:checked').value;
+    const full_name = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name, phone, role } },
+    });
+
+    if (error) {
+      showMsg(error.message, 'error');
+      submitBtn.textContent = 'إنشاء الحساب';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    if (data.session) {
+      window.location.href = role === 'merchant' ? 'merchant/dashboard.html' : 'index.html';
+    } else {
+      showMsg('تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب قبل تسجيل الدخول.', 'success');
+      submitBtn.textContent = 'إنشاء الحساب';
+      submitBtn.disabled = false;
+      form.reset();
+    }
+  });
+</script>
+</body>
+</html>

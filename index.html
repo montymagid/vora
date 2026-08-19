@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VORA — قارن. اختر الأوفر. اشترِ.</title>
+<meta name="description" content="VORA منصة سعودية تقارن أسعار المنتجات من عدة متاجر لتجد لك أفضل عرض قبل ما تشتري.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-header" id="siteHeader">
+  <div class="container header-inner">
+    <a href="#" class="logo" aria-label="VORA — الرئيسية">
+      <span class="logo-mark">V</span>
+      <span class="logo-word">VORA</span>
+    </a>
+
+    <form class="header-search" id="headerSearchForm" role="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="headerSearchInput" placeholder="دوّر على أي منتج… آيفون، لابتوب، سماعات" autocomplete="off">
+    </form>
+
+    <nav class="header-nav">
+      <a href="#categories">التصنيفات</a>
+      <a href="#deals">أفضل العروض</a>
+      <a href="#merchants">للمتاجر</a>
+      <a href="#faq">الأسئلة الشائعة</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="merchantCta">سجّل متجرك</button>
+      <div id="authSlot" class="auth-slot"></div>
+      <button class="icon-btn" id="menuToggle" aria-label="القائمة">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-search container">
+    <form id="mobileSearchForm" role="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="mobileSearchInput" placeholder="دوّر على أي منتج…" autocomplete="off">
+    </form>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <a href="#categories">التصنيفات</a>
+  <a href="#deals">أفضل العروض</a>
+  <a href="#trending">الأكثر بحثًا</a>
+  <a href="#merchants">للمتاجر</a>
+  <a href="#faq">الأسئلة الشائعة</a>
+  <div id="authSlotMobile" class="auth-slot-mobile"></div>
+  <button class="btn btn-primary" id="merchantCtaMobile">سجّل متجرك</button>
+</div>
+
+<main>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">اكتشاف المنتجات + مقارنة الأسعار</div>
+      <h1 class="hero-title">قارن الأسعار<br><span class="accent-text">قبل ما تشتري.</span></h1>
+      <p class="hero-sub">VORA يجمع لك عروض نون وأمازون والمتاجر السعودية في مكان واحد، عشان توفر وقتك وفلوسك.</p>
+
+      <form class="hero-search" id="heroSearchForm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="heroSearchInput" placeholder="ابحث عن آيفون، لابتوب، سماعات…" autocomplete="off">
+        <button type="submit" class="btn btn-primary">بحث</button>
+      </form>
+
+      <div class="hero-stats" id="heroStats">
+        <div class="stat-chip"><span class="stat-num" data-stat="products">—</span><span class="stat-label">منتج مقارَن</span></div>
+        <div class="stat-chip"><span class="stat-num" data-stat="stores">—</span><span class="stat-label">متجر ومصدر</span></div>
+        <div class="stat-chip"><span class="stat-num" data-stat="offers">—</span><span class="stat-label">عرض سعر حي</span></div>
+      </div>
+    </div>
+
+    <!-- signature element: live price-drop ticker -->
+    <div class="ticker-wrap" aria-label="آخر انخفاضات الأسعار">
+      <div class="ticker-track" id="tickerTrack">
+        <span class="ticker-item">جاري تحميل آخر انخفاضات الأسعار…</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CATEGORIES ===================== -->
+  <section class="section" id="categories">
+    <div class="container">
+      <div class="section-head">
+        <h2>تسوّق حسب التصنيف</h2>
+      </div>
+      <div class="cat-row" id="categoryRow"></div>
+    </div>
+  </section>
+
+  <!-- ===================== DEALS ===================== -->
+  <section class="section" id="deals">
+    <div class="container">
+      <div class="section-head">
+        <h2>أفضل العروض اليوم</h2>
+        <p class="section-sub">أكبر نسب انخفاض بالأسعار الآن، محسوبة تلقائيًا من عدة متاجر</p>
+      </div>
+      <div class="product-grid" id="dealsGrid">
+        <div class="skeleton-row"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="section how-it-works">
+    <div class="container">
+      <div class="section-head">
+        <h2>كيف تشتري بذكاء عبر VORA؟</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>ابحث عن منتجك</h3>
+          <p>اكتب اسم المنتج اللي تبيه، ونجمع لك كل العروض المتوفرة من مصادر متعددة.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>قارن العروض</h3>
+          <p>نعرض لك السعر، السعر السابق، نسبة الخصم، والتوفر من كل متجر جنب بعض.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>انتقل واشترِ</h3>
+          <p>تختار الأوفر، وننقلك مباشرة لصفحة المتجر لإتمام الشراء بأمان.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TRENDING ===================== -->
+  <section class="section" id="trending">
+    <div class="container">
+      <div class="section-head">
+        <h2>الأكثر بحثًا هذا الأسبوع</h2>
+      </div>
+      <div class="product-grid" id="trendingGrid">
+        <div class="skeleton-row"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MERCHANTS CTA ===================== -->
+  <section class="section merchants" id="merchants">
+    <div class="container merchants-inner">
+      <div class="merchants-copy">
+        <div class="eyebrow eyebrow-dark">لأصحاب المتاجر</div>
+        <h2>وصّل منتجاتك لعملاء يقارنون فعليًا</h2>
+        <p>سجّل متجرك في VORA، استورد منتجاتك برابط واحد بدل الإدخال اليدوي، وتابع أداءك بلوحة تحكم كاملة.</p>
+        <ul class="merchant-points">
+          <li>استيراد المنتجات تلقائيًا برابط المنتج</li>
+          <li>باقات مرنة تناسب حجم متجرك</li>
+          <li>تحليلات مشاهدات ونقرات وواتساب</li>
+        </ul>
+        <button class="btn btn-primary btn-lg" id="merchantCtaBottom">ابدأ التسجيل الآن</button>
+      </div>
+      <div class="merchants-visual" aria-hidden="true">
+        <div class="mini-card">
+          <div class="mini-card-row"><span>مشاهدات المتجر</span><strong>12,480</strong></div>
+          <div class="mini-card-row"><span>نقرات واتساب</span><strong>1,024</strong></div>
+          <div class="mini-card-row"><span>منتجات مستوردة</span><strong>86</strong></div>
+          <div class="mini-card-bar"><span style="width:72%"></span></div>
+          <div class="mini-card-foot">أداء هذا الشهر <b class="up">+18%</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIALS ===================== -->
+  <section class="section testimonials">
+    <div class="container">
+      <div class="section-head">
+        <h2>مستخدمون وفّروا مع VORA</h2>
+      </div>
+      <div class="testi-row">
+        <blockquote class="testi-card">
+          <p>“قارنت سعر اللابتوب بثلاث دقائق ووفرت أكثر من 400 ريال بدون ما أفتح خمس مواقع.”</p>
+          <cite>— م. سعود، الرياض</cite>
+        </blockquote>
+        <blockquote class="testi-card">
+          <p>“عجبتني ميزة تتبع السعر، انتظرت لين نزل السعر وشريت وقتها.”</p>
+          <cite>— نورة ع.، جدة</cite>
+        </blockquote>
+        <blockquote class="testi-card">
+          <p>“كصاحب متجر، استيراد المنتجات بالرابط وفر عليّ وقت إدخال يدوي كثير.”</p>
+          <cite>— متجر تك زون</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="section faq" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <h2>أسئلة شائعة</h2>
+      </div>
+      <div class="faq-list" id="faqList">
+        <div class="faq-item">
+          <button class="faq-q">هل VORA تبيع المنتجات مباشرة؟<span class="faq-icon">+</span></button>
+          <div class="faq-a"><p>لا، VORA لا تبيع ولا تمتلك مخزونًا. نساعدك تكتشف وتقارن العروض، وتشتري مباشرة من المتجر الأصلي.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">وش يصير لو صار فيه مشكلة بالمنتج بعد الشراء؟<span class="faq-icon">+</span></button>
+          <div class="faq-a"><p>عملية الشراء والشحن والدعم تكون مسؤولية المتجر الذي أتممت الشراء منه، وليست VORA.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">هل التسجيل كمتجر له رسوم؟<span class="faq-icon">+</span></button>
+          <div class="faq-a"><p>فيه باقة مجانية للبداية، وباقات مدفوعة (بزنس وبرو) توفر مزايا أكبر مثل الاستيراد التلقائي والتحليلات المتقدمة.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">هل أقدر أتابع سعر منتج وينبهني إذا نزل؟<span class="faq-icon">+</span></button>
+          <div class="faq-a"><p>نعم، تقدر تفعّل تنبيه سعر على أي منتج وتحدد السعر اللي يناسبك، ونعلمك أول ما يوصله.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></div>
+      <p>Find. Compare. Buy.<br>منصة سعودية لاكتشاف المنتجات ومقارنة الأسعار.</p>
+    </div>
+    <div class="footer-col">
+      <h4>الشركة</h4>
+      <a href="#">عن VORA</a>
+      <a href="#">تواصل معنا</a>
+      <a href="#merchants">سجّل متجرك</a>
+    </div>
+    <div class="footer-col">
+      <h4>روابط</h4>
+      <a href="#categories">التصنيفات</a>
+      <a href="#deals">أفضل العروض</a>
+      <a href="#faq">الأسئلة الشائعة</a>
+    </div>
+    <div class="footer-col">
+      <h4>قانوني</h4>
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">الشروط والأحكام</a>
+    </div>
+  </div>
+  <div class="footer-note container">
+    VORA منصة اكتشاف منتجات ومقارنة أسعار فقط، ولا تبيع أو تشحن أو تعالج مدفوعات المنتجات المعروضة من متاجر خارجية. أي عملية شراء تتم عبر الانتقال لموقع المتجر الأصلي وتخضع لشروطه.
+  </div>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

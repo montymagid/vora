@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الأدمن — VORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <a href="../index.html" class="logo"><span class="logo-mark">V</span><span class="logo-word">VORA</span></a>
+    <nav class="dash-nav">
+      <a href="#overview" class="nav-link active" data-section="overview">📊 نظرة عامة</a>
+      <a href="#merchants" class="nav-link" data-section="merchants">🏪 المتاجر</a>
+      <a href="#products" class="nav-link" data-section="products">📦 المنتجات</a>
+      <a href="#categories" class="nav-link" data-section="categories">🗂️ التصنيفات</a>
+      <a href="#sources" class="nav-link" data-section="sources">🔌 المصادر</a>
+    </nav>
+    <div class="dash-user" id="dashUser">جاري التحميل…</div>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <section class="dash-section" id="sec-overview">
+      <div class="dash-head"><div><h1>نظرة عامة على VORA</h1><p>أرقام حية من قاعدة البيانات</p></div></div>
+      <div class="stat-cards" id="overviewStats">
+        <div class="stat-card"><div class="num">—</div><div class="label">إجمالي المستخدمين</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">المتاجر (بانتظار الاعتماد)</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">إجمالي المنتجات</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">إجمالي العروض النشطة</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">متاجر مشتركة (مدفوع)</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">إيراد اشتراكات شهري تقديري</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">نقرات Affiliate</div></div>
+        <div class="stat-card"><div class="num">—</div><div class="label">متاجر بانتظار الموافقة</div></div>
+      </div>
+    </section>
+
+    <!-- MERCHANTS -->
+    <section class="dash-section" id="sec-merchants" style="display:none;">
+      <div class="dash-head"><div><h1>إدارة المتاجر</h1><p>اعتماد وإيقاف المتاجر المسجلة</p></div></div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>المتجر</th><th>المدينة</th><th>الحالة</th><th>الاشتراك</th><th></th></tr></thead>
+            <tbody id="merchantsTableBody"><tr><td colspan="5" class="price-hint">جاري التحميل…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="dash-section" id="sec-products" style="display:none;">
+      <div class="dash-head"><div><h1>إدارة المنتجات</h1><p>كل المنتجات الرئيسية في VORA</p></div></div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>المنتج</th><th>التصنيف</th><th>عدد العروض</th><th>الحالة</th><th></th></tr></thead>
+            <tbody id="productsTableBody"><tr><td colspan="5" class="price-hint">جاري التحميل…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="dash-section" id="sec-categories" style="display:none;">
+      <div class="dash-head"><div><h1>التصنيفات</h1><p>أضف وعدّل تصنيفات المنتجات بدون تعديل الكود</p></div></div>
+      <div class="panel">
+        <div class="panel-head"><h2>إضافة تصنيف جديد</h2></div>
+        <form id="categoryForm" style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;"><label>الاسم بالعربي</label><input type="text" id="catName" required></div>
+          <div class="form-group" style="margin-bottom:0;"><label>أيقونة (إيموجي)</label><input type="text" id="catIcon" placeholder="🛍️" style="width:90px;"></div>
+          <button class="btn btn-primary" type="submit">إضافة</button>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>التصنيف</th><th>الحالة</th><th></th></tr></thead>
+            <tbody id="categoriesTableBody"><tr><td colspan="3" class="price-hint">جاري التحميل…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="dash-section" id="sec-sources" style="display:none;">
+      <div class="dash-head"><div><h1>مصادر البيانات</h1><p>المصادر والConnectors المرتبطة باستيراد المنتجات</p></div></div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>المصدر</th><th>النوع</th><th>Affiliate</th><th>الحالة</th></tr></thead>
+            <tbody id="sourcesTableBody"><tr><td colspan="4" class="price-hint">جاري التحميل…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="../js/admin.js"></script>
+</body>
+</html>
