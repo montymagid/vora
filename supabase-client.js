@@ -1,11 +1,17 @@
 // ============================================================
-// VORA — Supabase client
-// Uses the public/publishable key only (safe for the browser).
-// Never put service_role keys in frontend code.
+// VORA — Supabase client (classic script, not an ES module)
+// Loaded via the Supabase UMD bundle so the site also works when
+// opened directly from disk (file://) and not only from a web server.
 // ============================================================
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+window.VORA = window.VORA || {};
 
-const SUPABASE_URL = 'https://moqrwmutnwqlwjsbybqo.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_cgsirf9wPxMf0f1PGL9F9Q_b_YWka3h';
+(function () {
+  var SUPABASE_URL = 'https://moqrwmutnwqlwjsbybqo.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_cgsirf9wPxMf0f1PGL9F9Q_b_YWka3h';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  if (typeof supabase === 'undefined') {
+    console.error('VORA: Supabase library did not load. Check your internet connection.');
+    return;
+  }
+  window.VORA.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+})();

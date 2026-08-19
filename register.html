@@ -2,11 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>إنشاء حساب — VORA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="auth-page">
@@ -18,7 +18,7 @@
     <div class="form-msg" id="formMsg"></div>
 
     <form id="registerForm">
-      <div class="role-toggle">
+      <div class="role-toggle" id="roleToggle">
         <label><input type="radio" name="role" value="customer" checked><span>مستخدم</span></label>
         <label><input type="radio" name="role" value="merchant"><span>صاحب متجر</span></label>
       </div>
@@ -48,46 +48,59 @@
   </div>
 </div>
 
-<script type="module">
-  import { supabase } from './js/supabase-client.js';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+  var roleToggle = document.getElementById('roleToggle');
+  roleToggle.querySelectorAll('input[name="role"]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      roleToggle.querySelectorAll('label').forEach(function (l) { l.classList.remove('is-active'); });
+      input.closest('label').classList.add('is-active');
+    });
+  });
+  roleToggle.querySelector('input:checked').closest('label').classList.add('is-active');
 
-  const form = document.getElementById('registerForm');
-  const msg = document.getElementById('formMsg');
-  const submitBtn = document.getElementById('submitBtn');
+  var form = document.getElementById('registerForm');
+  var msg = document.getElementById('formMsg');
+  var submitBtn = document.getElementById('submitBtn');
 
   function showMsg(text, type) {
     msg.textContent = text;
-    msg.className = `form-msg show ${type}`;
+    msg.className = 'form-msg show ' + type;
   }
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     submitBtn.textContent = 'جاري الإنشاء…';
     submitBtn.disabled = true;
 
-    const role = form.querySelector('input[name="role"]:checked').value;
-    const full_name = document.getElementById('fullName').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    var role = form.querySelector('input[name="role"]:checked').value;
+    var full_name = document.getElementById('fullName').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name, phone, role } },
+    var res = await window.VORA.supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: { data: { full_name: full_name, phone: phone, role: role } },
     });
 
-    if (error) {
-      showMsg(error.message, 'error');
+    if (res.error) {
+      var text = res.error.message;
+      if (text.indexOf('already registered') !== -1 || text.indexOf('already exists') !== -1) {
+        text = 'هذا البريد مسجّل مسبقًا. سجّل دخولك بدل إنشاء حساب جديد.';
+      }
+      showMsg(text, 'error');
       submitBtn.textContent = 'إنشاء الحساب';
       submitBtn.disabled = false;
       return;
     }
 
-    if (data.session) {
+    if (res.data.session) {
       window.location.href = role === 'merchant' ? 'merchant/dashboard.html' : 'index.html';
     } else {
-      showMsg('تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب قبل تسجيل الدخول.', 'success');
+      showMsg('تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب قبل تسجيل الدخول (تحقق من الرسائل غير المرغوبة أيضًا).', 'success');
       submitBtn.textContent = 'إنشاء الحساب';
       submitBtn.disabled = false;
       form.reset();

@@ -2,11 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>تسجيل الدخول — VORA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="auth-page">
@@ -30,47 +30,59 @@
     </form>
 
     <div class="auth-foot">ما عندك حساب؟ <a href="register.html">أنشئ حساب جديد</a></div>
+    <div class="auth-foot" style="margin-top:8px;"><a href="#" id="resendLink">ما وصلني إيميل التأكيد — أعد الإرسال</a></div>
   </div>
 </div>
 
-<script type="module">
-  import { supabase } from './js/supabase-client.js';
-  import { getProfile } from './js/auth.js';
-
-  const form = document.getElementById('loginForm');
-  const msg = document.getElementById('formMsg');
-  const submitBtn = document.getElementById('submitBtn');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  var form = document.getElementById('loginForm');
+  var msg = document.getElementById('formMsg');
+  var submitBtn = document.getElementById('submitBtn');
 
   function showMsg(text, type) {
     msg.textContent = text;
-    msg.className = `form-msg show ${type}`;
+    msg.className = 'form-msg show ' + type;
   }
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     submitBtn.textContent = 'جاري الدخول…';
     submitBtn.disabled = true;
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    var res = await window.VORA.supabase.auth.signInWithPassword({ email: email, password: password });
 
-    if (error) {
-      showMsg(error.message === 'Invalid login credentials' ? 'البريد أو كلمة المرور غير صحيحة' : error.message, 'error');
+    if (res.error) {
+      var text = res.error.message;
+      if (text === 'Invalid login credentials') text = 'البريد أو كلمة المرور غير صحيحة';
+      if (text.indexOf('Email not confirmed') !== -1) text = 'لازم تأكد بريدك الإلكتروني أول. تحقق من صندوق الوارد (أو الرسائل غير المرغوبة).';
+      showMsg(text, 'error');
       submitBtn.textContent = 'تسجيل الدخول';
       submitBtn.disabled = false;
       return;
     }
 
-    const profile = await getProfile();
-    if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+    var profile = await window.VORA.auth.getProfile();
+    if (profile && (profile.role === 'admin' || profile.role === 'super_admin')) {
       window.location.href = 'admin/dashboard.html';
-    } else if (profile?.role === 'merchant') {
+    } else if (profile && profile.role === 'merchant') {
       window.location.href = 'merchant/dashboard.html';
     } else {
       window.location.href = 'index.html';
     }
+  });
+
+  document.getElementById('resendLink').addEventListener('click', async function (e) {
+    e.preventDefault();
+    var email = document.getElementById('email').value.trim();
+    if (!email) { showMsg('اكتب بريدك الإلكتروني فوق أول.', 'error'); return; }
+    var res = await window.VORA.supabase.auth.resend({ type: 'signup', email: email });
+    showMsg(res.error ? 'تعذر إعادة الإرسال، حاول بعد شوي.' : 'تم إرسال رابط التأكيد من جديد، تحقق من بريدك.', res.error ? 'error' : 'success');
   });
 </script>
 </body>

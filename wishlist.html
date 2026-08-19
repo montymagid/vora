@@ -2,11 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>قائمتي — VORA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -17,9 +17,20 @@
       <a href="index.html#categories">التصنيفات</a>
       <a href="index.html#deals">أفضل العروض</a>
     </nav>
-    <div class="header-actions"><div id="authSlot" class="auth-slot"></div></div>
+    <div class="header-actions">
+      <div id="authSlot" class="auth-slot"></div>
+      <button class="icon-btn" id="menuToggle" aria-label="القائمة">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
   </div>
 </header>
+
+<div class="mobile-drawer" id="mobileDrawer">
+  <a href="index.html#categories">التصنيفات</a>
+  <a href="index.html#deals">أفضل العروض</a>
+  <div id="authSlotMobile" class="auth-slot-mobile"></div>
+</div>
 
 <main class="section">
   <div class="container">
@@ -45,70 +56,69 @@
   </div>
 </main>
 
-<script type="module">
-  import { supabase } from './js/supabase-client.js';
-  import { renderAuthState, requireAuth } from './js/auth.js';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  var fmt = new Intl.NumberFormat('ar-SA');
+  var money = function (n) { return fmt.format(Math.round(n)) + ' ر.س'; };
+  var sb = window.VORA.supabase;
 
-  const fmt = new Intl.NumberFormat('ar-SA');
-  const money = (n) => `${fmt.format(Math.round(n))} ر.س`;
+  window.VORA.auth.renderAuthState();
 
-  renderAuthState();
-
-  (async () => {
-    const user = await requireAuth();
+  (async function () {
+    var user = await window.VORA.auth.requireAuth();
     if (!user) return;
 
-    // Wishlist
-    const grid = document.getElementById('wishlistGrid');
-    const { data: wl } = await supabase
-      .from('wishlist')
+    var grid = document.getElementById('wishlistGrid');
+    var wlRes = await sb.from('wishlist')
       .select('product_id, products ( name_ar, slug, primary_image_url, rating, product_offers ( price, previous_price ) )')
       .eq('user_id', user.id);
+    var wl = wlRes.data;
 
     if (!wl || !wl.length) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">♡</div><p>ما ضفت أي منتج للمفضلة بعد.</p></div>';
     } else {
-      grid.innerHTML = wl.map(({ products: p }) => {
-        const offers = p.product_offers || [];
-        const best = offers.length ? [...offers].sort((a,b)=>a.price-b.price)[0] : null;
-        const img = p.primary_image_url || '';
-        return `
-          <a class="product-card" href="product.html?slug=${encodeURIComponent(p.slug)}">
-            <div class="product-thumb"><img src="${img}" alt="${p.name_ar}" loading="lazy"></div>
-            <div class="product-body">
-              <div class="product-name">${p.name_ar}</div>
-              <div class="price-row">${best ? `<span class="price-now">${money(best.price)}</span>` : '<span class="price-hint">غير متوفر</span>'}</div>
-            </div>
-          </a>`;
+      grid.innerHTML = wl.map(function (row) {
+        var p = row.products;
+        var offers = p.product_offers || [];
+        var best = offers.length ? offers.slice().sort(function (a, b) { return a.price - b.price; })[0] : null;
+        return '<a class="product-card" href="product.html?slug=' + encodeURIComponent(p.slug) + '">' +
+          '<div class="product-thumb"><img src="' + (p.primary_image_url || '') + '" alt="' + p.name_ar + '" loading="lazy"></div>' +
+          '<div class="product-body"><div class="product-name">' + p.name_ar + '</div>' +
+          '<div class="price-row">' + (best ? '<span class="price-now">' + money(best.price) + '</span>' : '<span class="price-hint">غير متوفر</span>') + '</div>' +
+          '</div></a>';
       }).join('');
     }
 
-    // Alerts
-    const tbody = document.querySelector('#alertsTable tbody');
-    const { data: alerts } = await supabase
-      .from('price_alerts')
+    var tbody = document.querySelector('#alertsTable tbody');
+    var alertsRes = await sb.from('price_alerts')
       .select('id, target_price, is_active, triggered_at, products ( name_ar, slug )')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+    var alerts = alertsRes.data;
 
     if (!alerts || !alerts.length) {
       tbody.innerHTML = '<tr><td colspan="4" class="price-hint">ما فعّلت أي تنبيه سعر بعد.</td></tr>';
     } else {
-      tbody.innerHTML = alerts.map(a => `
-        <tr>
-          <td><a href="product.html?slug=${encodeURIComponent(a.products?.slug ?? '')}">${a.products?.name_ar ?? 'منتج'}</a></td>
-          <td style="font-family:var(--font-mono);">${money(a.target_price)}</td>
-          <td>${a.triggered_at ? '<span class="pill pill-green">تم التنبيه</span>' : a.is_active ? '<span class="pill pill-gray">بالانتظار</span>' : '<span class="pill pill-orange">موقوف</span>'}</td>
-          <td><button class="btn btn-ghost btn-sm" data-id="${a.id}" onclick="deleteAlert('${a.id}')">حذف</button></td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = alerts.map(function (a) {
+        var status = a.triggered_at ? '<span class="pill pill-green">تم التنبيه</span>' : (a.is_active ? '<span class="pill pill-gray">بالانتظار</span>' : '<span class="pill pill-orange">موقوف</span>');
+        var name = (a.products && a.products.name_ar) || 'منتج';
+        var slug = (a.products && a.products.slug) || '';
+        return '<tr><td><a href="product.html?slug=' + encodeURIComponent(slug) + '">' + name + '</a></td>' +
+          '<td style="font-family:var(--font-mono);">' + money(a.target_price) + '</td>' +
+          '<td>' + status + '</td>' +
+          '<td><button class="btn btn-ghost btn-sm" data-id="' + a.id + '">حذف</button></td></tr>';
+      }).join('');
+
+      tbody.querySelectorAll('[data-id]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          await sb.from('price_alerts').delete().eq('id', btn.dataset.id);
+          location.reload();
+        });
+      });
     }
   })();
-
-  window.deleteAlert = async (id) => {
-    await supabase.from('price_alerts').delete().eq('id', id);
-    location.reload();
-  };
 </script>
 </body>
 </html>
